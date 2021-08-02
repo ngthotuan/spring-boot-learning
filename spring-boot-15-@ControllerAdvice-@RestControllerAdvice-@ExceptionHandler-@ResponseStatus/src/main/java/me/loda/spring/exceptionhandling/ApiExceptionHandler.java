@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 /**
  * Copyright 2019 {@author Loda} (https://loda.me).
@@ -29,9 +30,21 @@ public class ApiExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorMessage handleAllException(Exception ex, WebRequest request) {
+    public ErrorMessage handleAllException(Exception ex) {
         // quá trình kiểm soat lỗi diễn ra ở đây
-        return new ErrorMessage(10000, ex.getLocalizedMessage());
+        ex.printStackTrace();
+        return new ErrorMessage(500, "Lỗi hệ thống");
+    }
+
+
+    /**
+     * NotFound Exception
+     */
+    @ExceptionHandler(NoHandlerFoundException.class)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public ErrorMessage handleNotFoundRoute(Exception ex) {
+        System.err.println(ex.getLocalizedMessage());
+        return new ErrorMessage(404, "Đường dẫn không tồn tại");
     }
 
     /**
@@ -40,6 +53,7 @@ public class ApiExceptionHandler {
     @ExceptionHandler(IndexOutOfBoundsException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorMessage TodoException(Exception ex, WebRequest request) {
-        return new ErrorMessage(10100, "Đối tượng không tồn tại");
+        System.err.println(ex.getMessage());
+        return new ErrorMessage(400, "Đối tượng không tồn tại");
     }
 }
